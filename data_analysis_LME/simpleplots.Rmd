@@ -1,0 +1,283 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+```{r}
+install.packages('retimes')
+
+install.packages('beeswarm')
+```
+```{r}
+mydata <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+
+sub1 <- subset(mydata, condition=='2000')
+sub2 <- subset(mydata, condition=='4000')
+ndata <- select(mydata,response_time)
+lapply(ndata, as.numeric)
+ndata <- unname(ndata)
+ndata <- unlist(ndata)
+
+print(typeof(ndata))
+```
+
+```{r}
+# Clear the workspace
+rm(list=ls())
+
+# Load the "retimes" package and use its function rexgauss() to simulate ex-gaussian data
+library(retimes)
+library("readxl")
+mydata <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+library(dplyr)
+
+ 
+# Select columns of the dataframe
+sub1 <- subset(mydata, condition=='2000')
+sub2 <- subset(mydata, condition=='4000')
+
+edata <- select(sub1,response_time)
+lapply(edata, as.numeric)
+ndata <- select(sub2,response_time)
+lapply(ndata, as.numeric)
+#sub1 %>% select(response_time)
+#ub2 %>% select(response_time)
+lapply(ndata, as.numeric)
+ndata <- unname(ndata)
+ndata <- unlist(ndata)
+
+edata <- unname(edata)
+edata <- unlist(edata)
+# Simulate normal data with the same mean and sd as the ex-gaussian data
+#ndata <- rnorm( length(edata), mean=mean(edata), sd=sd(edata) )
+
+
+# (Commented out) Saves the figure to a file. Uncomment (and fix the file path) and uncomment the dev.off() at the bottom to make this work)
+#tiff( file="C:\\Users\\sjpolit\\Desktop\\Fig1.tif", type="cairo", res=300, unit="in", width=15, height=8 )
+
+# Arranges three subplots, 1 row and 3 columns
+par(mfrow=c(1,3))
+#as.numeric(edata)
+# Calculates the means and SDs of each dataset
+means <- c( mean(ndata), mean(edata) )
+
+sds <- c( sd(ndata), sd(edata) )
+
+# Sets the y-axis limits to be used in all the plots
+ylim <- c( 100, 1000 )
+
+
+
+# First subplot: a barplot with error bars
+xvals <- barplot(
+	c(mean(ndata),mean(edata)), # Plot the two means
+	ylim=ylim, # y-axis limits
+	names.arg=c("Low", "High"), # Labels to go over the x-axis
+	cex.names=2, # Increase the size of the axis labels
+	cex.axis=2, # Increase the size of the axis tick labels
+	yaxt="n", # Hide the y-axis
+	main="Barplots with error bars", # Plot title
+	cex.main=2, # Increase the size of the plot title
+	col=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5)) , # bar colours: opaque green and opaque purple
+	xpd=F # Stop the bars from stretching below the bottom of the plot
+)
+
+# Error bars for +- 1 SD
+arrows( xvals, means+sds, xvals, means-sds, code=3, angle=90, length=.2, lwd=2 )
+
+# Sets up y-axis ticks and labels
+axis(2, at=seq(100,700,by=100), labels=seq(100,700,by=100), cex.axis=2 )
+
+
+# Second subplot: a boxplot
+boxplot(
+	list(ndata,edata), # the two datasets to boxplot
+	ylim=ylim,# y-axis limits
+	pch=21, # Use circles with borders as the points
+	bg=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5) ), # background colour for the points: opaque green and opaque purple
+	cex=1.25, # Increase the size of the points
+	cex.names=2, # Increase the size of the axis labels
+	cex.axis=2, # Increase the size of the axis tick labels
+	main="Boxplots", # plot title
+	cex.main=2,# Increase the size of the plot title
+	col=c( rgb(0,.75,0), rgb(.75,0,.75,alpha=.5) ), # box colours: opaque green and opaque purple
+	yaxt="n", # Hide the y-axis
+	yaxs="i", # Make the y-axis fit exactly to the limits
+	frame=F, # Remove the box around the plot
+	xaxt="n" # Hide the x-axis
+)
+
+# Sets up the y-axis ticks and labels
+axis(2, at=seq(100,700,by=100), labels=seq(100,700,by=100), cex.axis=2 )
+
+# x-axis labels
+text( 1:2, rep(193,2), c("Low", "High"), cex=2, xpd=NA, adj=c(.5,1) )
+
+
+# Third subplot: two univariate scatters
+library(beeswarm)
+beeswarm(
+	list(ndata,edata), # the two datasets to plot
+	corral="none", # no corral (see the help page for beeswarm())
+	ylim=ylim, # y-axis limits
+	labels=c("Low", "High"), # x-axis labels
+	pch=21, # Use circles with borders as the points
+	bg=c( "green", rgb(.75,0,.75) ), # background colours
+	cex.axis=2, # Increase the size of the axis tick labels
+	main="Univariate scatterplots", # Plot title
+	cex.main=2, # Increase the size of the plot title
+	col=c(rgb(0,.75,0),"purple"), # colours for the outlines of hte points
+	yaxt="n", # Hide the y-axis
+	yaxs="i", # Make the y-axis fit exactly the limits
+	bty="n" # Remove the box around the plot
+)
+
+# Sets up the y-axis ticks and labels
+axis(2, at=seq(100,700,by=100), labels=seq(100,700,by=100), cex.axis=2 )
+
+
+# Finishes the figure (uncomment to use)
+#dev.off()
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+```{r}
+# A function for just plotting paired data (as two univariate scatterplots with lines connecting the related datapoints)
+mydata <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+specialplot2 <- function( condition1, condition2, labels=c("Condition1", "Condition2"), dvlab="DV", main=NA, pch=21, pt.col="black", pt.bg=rgb(.5,.5,.5,alpha=.75), l.col=rgb(.5,.5,.5,alpha=.5) ){
+	
+	# number of observations per condition
+	N <- length(condition1)
+
+	# x-coordinates for the data points. This is set up in a way to jitter the x-coordinates but
+	#	also make sure that each pair of data points has the same x-distance between them
+	xvalues <- jitter( rep( 0, each=N ), 10 )
+	xvalues <- c( xvalues-1, xvalues+1 )
+
+	# Set up the plot area
+	plot(
+		xvalues, 
+		c(condition1, condition2), 
+		xaxt="n", # suppresses x-axis ticks
+		type="n", # leaves the plot area blank
+		ylab=dvlab, # y-axis label
+		xlim=c(-2,2), # x-axis limits
+		xlab=NA, # suppresses the x-axis label
+		main=main, # subplot title
+		cex.main=2, # Increase the font size for the subplot title
+		ylim=c(100,1000), # y-axis limit
+		cex.lab=2 # large font axis label
+	)
+
+	# x-axis ticks labelling the conditions
+	axis( 1, at=c(-1,1), labels=labels, cex.axis=2 )
+
+	# For each related pair of datapoints, draw a line that will connect the datapoint in condition1 to the datapoint in condiiton2
+	for( i in 1:N ){
+		lines( xvalues[c(i,i+N)], c(condition1[i], condition2[i]), col=l.col )
+	}
+
+	# Draw the two univariate scatters
+	points( xvalues, c(condition1, condition2), pch=pch, bg=pt.bg, col=pt.col )
+	
+	par(new=F )
+
+}
+
+# Load the simulated VOT data
+#simdata <- read.csv( file=file.choose() )
+simdata <- subset(mydata, condition=='2000'| condition == '4000')
+
+# Save figure to a file (to use this, uncomment this line and the dev.off() at the end)
+#tiff( file="C:\\Users\\sjpolit\\Desktop\\Fig4.tif", width=10.5, height=5.25, unit="in", res=300, type="cairo" )
+
+# figure with two subplots
+par(mfrow=c(1,2), mar=c(5.1,5.1,2.1,5.1))
+
+# Aggregate the data by subjects
+means <- tapply( simdata$response_time, list( simdata$condition, simdata$subid ), mean )
+
+# Plot the data aggregated by subjects
+specialplot2( means[1,], means[2,], labels=c("High", "Low"), dvlab="Response Time (ms)", main="By participants", pt.col="red", pt.bg=rgb(.75,0,0,alpha=.25), l.col=rgb(.75,0,0,alpha=.25), pch=21 )
+
+# Aggregate the data by items
+means <- tapply( simdata$response_time, list( simdata$condition, simdata$question_number ), mean )
+
+# Plot the data aggregated by items
+specialplot2( means[1,], means[2,], labels=c("High", "Low"), dvlab="Response Time (ms)", main="By items", pt.col="blue", pt.bg=rgb(0,0,.75,alpha=.25), l.col=rgb(0,0,.75,alpha=.25), pch=22 )
+
+# Finish the plot
+#dev.off()
+```
+
+```{r}
+# Clear the workspace
+rm(list=ls())
+
+
+
+
+
+# Load the simulated VOT data
+data <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+data <- subset(data, condition=='2000'|condition == '4000')
+
+# Aggregate the data by subjects (top) and items (bottom)
+s <- tapply( data$response_time, data[,c("condition","subid")], mean )
+i <- tapply( data$response_time, data[,c("condition","question_number")], mean )
+
+# Get the subject-wise and item-wise slow-fast differences
+s <- s[2,] - s[1,]
+i <- i[2,] - i[1,]
+
+# Save the figure to a file (to use this, uncomment this line and the dev.off() at the bottom)
+#tiff( "C:\\Users\\sjpolit\\Desktop\\Fig5.tif", width=6, height=6, units="in", type="cairo", res=300 )
+
+
+# Plot the scatters
+library(beeswarm)
+beeswarm(
+	list(s,i), # the two datasets to plot
+	corral="none", # No corral (see documentation for beeswarm())
+	ylim=1.1*range(c(s,i)), # y-axis limits. This only works because we know the dataset has both positive and negative values; if it were all positive or all negative, this would cut off some of the data
+	labels=c("By participants", "By items"), # x-axis tick labels
+	pch=c(21,22), # use outlined circles for the subject differences and outlined squares for hte item differences
+	bg=c( rgb(.75,0,0,alpha=.25), rgb(0,0,.75,alpha=.25) ), # light red background and light blue background
+	cex.axis=1.5, # Increase the font size of the axis tick labels
+	main="Aggregated effects", # Plot title
+	cex.main=2, # Increase the font size of the plot title
+	col=c("red","blue"), # Colours for point outlines
+	bty="n", # No box around ht eplot
+	ylab="Cloze Probability effect (High-Low), ms RT", # y-axis label
+	cex.lab=1.5 # Increase the font size of the axis label
+)
+
+# Draws a line at 0 effect size
+lines(c(-10,10),c(0,0))
+
+# Mean effect size by subject and by item
+m <- c(mean(s), mean(i))
+
+# Margins of error for the subject-wise and item-wise effect sizes
+sd(s)/sqrt(length(s)) * qt(.975,length(s)-1) -> sMoE
+sd(i)/sqrt(length(i)) * qt(.975,length(i)-1) -> iMoE
+MoE <- c( sMoE, iMoE )
+
+# Draw error bars indicating by-subject and by-item 95% CIs
+arrows( c(1,2), m-MoE, c(1,2), m+MoE, angle=90, code=3, lwd=4, length=.2 )
+
+
+
+# Finish the plot
+#dev.off()
+```
+

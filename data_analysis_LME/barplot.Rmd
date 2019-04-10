@@ -1,0 +1,260 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, 
+```{r}
+# Clear the workspace
+rm(list=ls())
+
+# Load the "retimes" package and use its function rexgauss() to simulate ex-gaussian data
+library(retimes)
+library("readxl")
+mydata <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+library(dplyr)
+
+ 
+# Select columns of the dataframe
+sub1 <- subset(mydata, condition=='2000')
+sub3 <- subset(mydata, condition=='3000')
+sub2 <- subset(mydata, condition=='4000')
+
+edata <- select(sub1,response_time)
+lapply(edata, as.numeric)
+ndata <- select(sub2,response_time)
+lapply(ndata, as.numeric)
+#sub1 %>% select(response_time)
+#ub2 %>% select(response_time)
+lapply(ndata, as.numeric)
+ndata <- unname(ndata)
+ndata <- unlist(ndata)
+
+edata <- unname(edata)
+edata <- unlist(edata)
+
+mid <- select(sub3,response_time)
+mid <- unname(ndata)
+mid <- unlist(mid)
+# Simulate normal data with the same mean and sd as the ex-gaussian data
+#ndata <- rnorm( length(edata), mean=mean(edata), sd=sd(edata) )
+
+
+# (Commented out) Saves the figure to a file. Uncomment (and fix the file path) and uncomment the dev.off() at the bottom to make this work)
+#tiff( file="C:\\Users\\sjpolit\\Desktop\\Fig10.tif", type="cairo", res=300, unit="in", width=12, height=6 )
+
+
+# Arranges three subplots, 1 row and 3 columns
+par(mfrow=c(1,3))
+#as.numeric(edata)
+# Calculates the means and SDs of each dataset
+means <- c( mean(ndata), mean(edata),mean(mid) )
+
+sds <- c( sd(ndata), sd(edata),sd(mid) )
+
+# Sets the y-axis limits to be used in all the plots
+ylim <- c( 100, 1000 )
+
+barnames<-c("Low","Mid","High")
+
+# First subplot: a barplot with error bars
+xvals <- barplot(
+	c(mean(ndata),mean(mid),mean(edata)), # Plot the three means
+	ylim=ylim, # y-axis limits
+	names.arg=barnames, # Labels to go over the x-axis
+	cex.names=2, # Increase the size of the axis labels
+	cex.axis=1.5, # Increase the size of the axis tick labels
+	yaxt="n", # Hide the y-axis
+	main="Barplots with error bars", # Plot title
+	cex.main=2, # Increase the size of the plot title
+	col=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5),rgb(0,0,.75,alpha=.5)) , # bar colours: opaque green and opaque purple
+	xpd=F # Stop the bars from stretching below the bottom of the plot
+)
+
+# Error bars for +- 1 SD
+arrows( xvals, means+sds, xvals, means-sds, code=3, angle=90, length=.2, lwd=2 )
+
+# Sets up y-axis ticks and labels
+axis(2, at=seq(0,700,by=100), labels=seq(0,700,by=100), cex.axis=2 )
+
+
+
+# Second subplot: a boxplot
+boxplot(
+	list(ndata,mid,edata), # the two datasets to boxplot
+	ylim=ylim,# y-axis limits
+	pch=21, # Use circles with borders as the points
+	names.arg=c("Low", "Mid","High"),
+
+	bg=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5),rgb(0,0,.75,alpha=.5) ), # background colour for the points: opaque green and opaque purple
+	cex=1.25, # Increase the size of the points
+	cex.names=2, # Increase the size of the axis labels
+	cex.axis=2, # Increase the size of the axis tick labels
+	main="Boxplots", # plot title
+	cex.main=2,# Increase the size of the plot title
+	col=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5),rgb(0,0,.75,alpha=.5) ), # box colours: opaque green and opaque purple
+	yaxt="n", # Hide the y-axis
+	yaxs="i", # Make the y-axis fit exactly to the limits
+	frame=F, # Remove the box around the plot
+	xaxt="n" # Hide the x-axis
+)
+
+# Sets up the y-axis ticks and labels
+axis(2, at=seq(0,700,by=100), labels=seq(0,700,by=100), cex.axis=2 )
+
+# x-axis labels
+text( 1:3, rep(193,2), c("Low", "Mid","High"), cex=2, xpd=NA, adj=c(.5,1,1.5),pos = 1 )
+
+
+# Third subplot: two univariate scatters
+library(beeswarm)
+beeswarm(
+	list(ndata,mid,edata), # the two datasets to plot
+	corral="none", # no corral (see the help page for beeswarm())
+	ylim=ylim, # y-axis limits
+	labels=c("Low", "Mid","High"), # x-axis labels
+	pch=21, # Use circles with borders as the points
+	bg=c( "green", rgb(.75,0,.75,alpha = .5) ), # background colours
+	cex.axis=2, # Increase the size of the axis tick labels
+	main="Univariate scatterplots", # Plot title
+	cex.main=2, # Increase the size of the plot title
+	col=c(rgb(0,.75,0,alpha=.5),rgb(0,0,.75,alpha = .5)), # colours for the outlines of hte points
+	#col2 = c(rgb(0,0,.75),"blue")
+	yaxt="n", # Hide the y-axis
+	yaxs="i", # Make the y-axis fit exactly the limits
+	bty="n" # Remove the box around the plot
+	
+)
+
+# Sets up the y-axis ticks and labels
+axis(2, at=seq(100,700,by=100), labels=seq(100,700,by=100), cex.axis=2 )
+
+
+# Finishes the figure (uncomment to use)
+#dev.off()
+```
+```{r}
+rm(list=ls())
+
+# Load the "retimes" package and use its function rexgauss() to simulate ex-gaussian data
+library(retimes)
+library("readxl")
+mydata <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+library(dplyr)
+
+ 
+# Select columns of the dataframe
+sub1 <- subset(mydata, condition=='2000')
+sub3 <- subset(mydata, condition=='3000')
+sub2 <- subset(mydata, condition=='4000')
+
+edata <- select(sub1,RT_pre)
+lapply(edata, as.numeric)
+ndata <- select(sub2,RT_pre)
+lapply(ndata, as.numeric)
+#sub1 %>% select(response_time)
+#ub2 %>% select(response_time)
+lapply(ndata, as.numeric)
+ndata <- unname(ndata)
+ndata <- unlist(ndata)
+
+edata <- unname(edata)
+edata <- unlist(edata)
+
+mid <- select(sub3,RT_pre)
+mid <- unname(ndata)
+mid <- unlist(mid)
+# Simulate normal data with the same mean and sd as the ex-gaussian data
+#ndata <- rnorm( length(edata), mean=mean(edata), sd=sd(edata) )
+
+
+# (Commented out) Saves the figure to a file. Uncomment (and fix the file path) and uncomment the dev.off() at the bottom to make this work)
+tiff( file="box_pre.tif", type="cairo", res=300, unit="in", width=12, height=6 )
+
+
+# Arranges three subplots, 1 row and 3 columns
+par(mfrow=c(1,3))
+#as.numeric(edata)
+# Calculates the means and SDs of each dataset
+means <- c( mean(ndata), mean(edata),mean(mid) )
+
+sds <- c( sd(ndata), sd(edata),sd(mid) )
+
+# Sets the y-axis limits to be used in all the plots
+ylim <- c( 100, 1000 )
+
+barnames<-c("Low","Mid","High")
+
+# First subplot: a barplot with error bars
+xvals <- barplot(
+	c(mean(ndata),mean(mid),mean(edata)), # Plot the three means
+	ylim=ylim, # y-axis limits
+	names.arg=barnames, # Labels to go over the x-axis
+	cex.names=2, # Increase the size of the axis labels
+	cex.axis=1.5, # Increase the size of the axis tick labels
+	yaxt="n", # Hide the y-axis
+	main="Barplots with error bars", # Plot title
+	cex.main=2, # Increase the size of the plot title
+	col=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5),rgb(0,0,.75,alpha=.5)) , # bar colours: opaque green and opaque purple
+	xpd=F # Stop the bars from stretching below the bottom of the plot
+)
+
+# Error bars for +- 1 SD
+arrows( xvals, means+sds, xvals, means-sds, code=3, angle=90, length=.2, lwd=2 )
+
+# Sets up y-axis ticks and labels
+axis(2, at=seq(0,700,by=100), labels=seq(0,700,by=100), cex.axis=2 )
+
+
+
+# Second subplot: a boxplot
+boxplot(
+	list(ndata,mid,edata), # the two datasets to boxplot
+	ylim=ylim,# y-axis limits
+	pch=21, # Use circles with borders as the points
+	names.arg=c("Low", "Mid","High"),
+
+	bg=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5),rgb(0,0,.75,alpha=.5) ), # background colour for the points: opaque green and opaque purple
+	cex=1.25, # Increase the size of the points
+	cex.names=2, # Increase the size of the axis labels
+	cex.axis=2, # Increase the size of the axis tick labels
+	main="Boxplots", # plot title
+	cex.main=2,# Increase the size of the plot title
+	col=c( rgb(0,.75,0,alpha=.5), rgb(.75,0,.75,alpha=.5),rgb(0,0,.75,alpha=.5) ), # box colours: opaque green and opaque purple
+	yaxt="n", # Hide the y-axis
+	yaxs="i", # Make the y-axis fit exactly to the limits
+	frame=F, # Remove the box around the plot
+	xaxt="n" # Hide the x-axis
+)
+
+# Sets up the y-axis ticks and labels
+axis(2, at=seq(0,700,by=100), labels=seq(0,700,by=100), cex.axis=2 )
+
+# x-axis labels
+text( 1:3, rep(193,2), c("Low", "Mid","High"), cex=2, xpd=NA, adj=c(.5,1,1.5),pos = 1 )
+
+
+# Third subplot: two univariate scatters
+library(beeswarm)
+beeswarm(
+	list(ndata,mid,edata), # the two datasets to plot
+	corral="none", # no corral (see the help page for beeswarm())
+	ylim=ylim, # y-axis limits
+	labels=c("Low", "Mid","High"), # x-axis labels
+	pch=21, # Use circles with borders as the points
+	bg=c( "green", rgb(.75,0,.75,alpha = .5) ), # background colours
+	cex.axis=2, # Increase the size of the axis tick labels
+	main="Univariate scatterplots", # Plot title
+	cex.main=2, # Increase the size of the plot title
+	col=c(rgb(0,.75,0,alpha=.5),rgb(0,0,.75,alpha = .5)), # colours for the outlines of hte points
+	#col2 = c(rgb(0,0,.75),"blue")
+	yaxt="n", # Hide the y-axis
+	yaxs="i", # Make the y-axis fit exactly the limits
+	bty="n" # Remove the box around the plot
+	
+)
+
+# Sets up the y-axis ticks and labels
+axis(2, at=seq(100,700,by=100), labels=seq(100,700,by=100), cex.axis=2 )
+
+```

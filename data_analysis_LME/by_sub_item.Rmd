@@ -1,0 +1,143 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+mydata <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+mydata <- subset(mydata,response_time < 1000 & response_time > 100 & RT_noun >100 & RT_noun < 1000)
+# Simulate condition 1
+
+
+cond1 <- subset(mydata,condition == '2000')
+cond1 <- tapply( cond1$response_time, list( cond1$subid ), mean )
+#cond1 <- select(cond1,RT_noun)
+#lapply(cond1, as.numeric)
+#cond1 <- unname(cond1)
+#cond1 <- unlist(cond1)
+
+# Simulate condition 2a: wider error bars because bigger SD
+cond2 <- subset(mydata, condition == '3000')
+#cond2 <- select(cond2,RT_noun)
+cond2 <- tapply( cond2$response_time, list( cond2$subid ), mean )
+#lapply(cond2, as.numeric)
+#cond2 <- unname(cond2)
+#cond2 <- unlist(cond2)
+
+# Simulate condition 2b: wider error bars because smaller N
+cond3 <- subset(mydata, condition == '4000')
+cond3 <- tapply( cond3$response_time, list( cond3$subid ), mean )
+#cond3 <- select(cond3,RT_noun)
+#lapply(cond3, as.numeric)
+#cond3 <- unname(cond3)
+#cond3 <- unlist(cond3)
+
+
+
+
+# Save the figure to a file (to use this, uncomment this line and the dev.off() at the bottom)
+#tiff( file="C:\\Users\\sjpolit\\Desktop\\Fig8.tif", type="cairo", res=300, unit="in", width=12, height=6 )
+
+# Bigger margins, and two subplots
+par(mar=c(4.1,5.1,1.1,1.1),mfrow=c(1,2))
+
+# x-values for the middle condition for plotting
+x <- jitter( rep(0,length(cond2)) )
+
+# Set up the plot area
+plot( x, cond2, ylim=c(0,max(c(cond1,cond2,cond3))*1.1), xlim=c(-.25,.25), type="n", ylab="RT (ms)",main="By subjects", xlab=NA, xaxt="n", cex.lab=2, cex.axis=1.5)
+
+# Labels for x-axis ticks. I used text() instead of axis() so I could adjust how far these are from the axis
+text( c(-.2,0,.2), rep(-.1,3), labels=c("High", "Mid", "Low"), cex=1.5, xpd=T )
+
+# For each participant, plot the connected points for the conditions
+for (i in 1:length(cond2)){
+  
+  # If I used just one points() or lines() call with type="o", the point outlines and connecting lines would be in the same colour. But I want solid point outlines and opaque connecting lines, so I use two calls here
+  points( x[i]+c(-.2,0,.2), cbind(cond1,cond2,cond3)[i,], col="red", bg=rgb(.75,0,0,alpha=.25), pch=21 )
+  lines( x[i]+c(-.2,0,.2), cbind(cond1,cond2,cond3)[i,], col=rgb(.75,0,0,alpha=.25) )
+}
+
+# Calculate the overall means across participants, and draw lines to show those means
+means <- colMeans(cbind(cond1,cond2,cond3))
+lines( c(-.225,-.175), rep(means[1],2), lwd=5 )
+lines( c(-.025,.025), rep(means[2],2), lwd=5 )
+lines( c(.225,.175), rep(means[3],2), lwd=5 )
+#subject 31 was excluded
+```
+
+
+```{r}
+mydata <- read_excel('~/Desktop/experiment/results/classifier.xlsx')
+mydata <- subset(mydata,response_time < 1000 & response_time > 100 & RT_noun >100 & RT_noun < 1000)
+# Simulate condition 1
+
+
+cond1 <- subset(mydata,condition == '2000')
+cond1 <- tapply( cond1$response_time, list( cond1$question_number ), mean )
+#cond1 <- select(cond1,RT_noun)
+#lapply(cond1, as.numeric)
+#cond1 <- unname(cond1)
+#cond1 <- unlist(cond1)
+
+# Simulate condition 2a: wider error bars because bigger SD
+cond2 <- subset(mydata, condition == '3000')
+#cond2 <- select(cond2,RT_noun)
+cond2 <- tapply( cond2$response_time, list( cond2$question_number ), mean )
+#lapply(cond2, as.numeric)
+#cond2 <- unname(cond2)
+#cond2 <- unlist(cond2)
+
+# Simulate condition 2b: wider error bars because smaller N
+cond3 <- subset(mydata, condition == '4000')
+cond3 <- tapply( cond3$response_time, list( cond3$question_number ), mean )
+#cond3 <- select(cond3,RT_noun)
+#lapply(cond3, as.numeric)
+#cond3 <- unname(cond3)
+#cond3 <- unlist(cond3)
+
+
+
+
+# Save the figure to a file (to use this, uncomment this line and the dev.off() at the bottom)
+#tiff( file="C:\\Users\\sjpolit\\Desktop\\Fig9.tif", type="cairo", res=300, unit="in", width=12, height=6 )
+
+# Bigger margins, and two subplots
+par(mar=c(4.1,5.1,1.1,1.1),mfrow=c(1,2))
+
+# x-values for the middle condition for plotting
+x <- jitter( rep(0,length(cond2)) )
+
+# Set up the plot area
+plot( x, cond2, ylim=c(0,max(c(cond1,cond2,cond3))*1.1), xlim=c(-.25,.25), type="n", ylab="RT (ms)",main="By items", xlab=NA, xaxt="n", cex.lab=2, cex.axis=1.5)
+
+# Labels for x-axis ticks. I used text() instead of axis() so I could adjust how far these are from the axis
+text( c(-.2,0,.2), rep(-.1,3), labels=c("High", "Mid", "Low"), cex=1.5, xpd=T )
+
+# For each participant, plot the connected points for the conditions
+for (i in 1:length(cond2)){
+  
+  # If I used just one points() or lines() call with type="o", the point outlines and connecting lines would be in the same colour. But I want solid point outlines and opaque connecting lines, so I use two calls here
+  points( x[i]+c(-.2,0,.2), cbind(cond1,cond2,cond3)[i,], col="red", bg=rgb(.75,0,0,alpha=.25), pch=21 )
+  lines( x[i]+c(-.2,0,.2), cbind(cond1,cond2,cond3)[i,], col=rgb(.75,0,0,alpha=.25) )
+}
+
+# Calculate the overall means across participants, and draw lines to show those means
+means <- colMeans(cbind(cond1,cond2,cond3))
+lines( c(-.225,-.175), rep(means[1],2), lwd=5 )
+lines( c(-.025,.025), rep(means[2],2), lwd=5 )
+lines( c(.225,.175), rep(means[3],2), lwd=5 )
+#subject 31 was excluded
+```
+
